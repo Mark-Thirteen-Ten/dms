@@ -282,6 +282,23 @@ class DMSFile(models.Model):
         result["context"] = dict(self.env.context)
         return result
 
+    @api.model
+    def action_open_with_default_directory(self):
+        """Open the files view with the first directory auto-selected."""
+        action = self.env["ir.actions.act_window"]._for_xml_id("dms.action_dms_file")
+        # Find the first directory the user has access to
+        first_directory = self.env["dms.directory"].search(
+            [("is_hidden", "=", False), ("permission_read", "=", True)],
+            limit=1,
+            order="id asc",
+        )
+        if first_directory:
+            action["context"] = dict(
+                self.env.context,
+                searchpanel_default_directory_id=first_directory.id,
+            )
+        return action
+
     # SearchPanel
     @api.model
     def _search_panel_directory(self, **kwargs):

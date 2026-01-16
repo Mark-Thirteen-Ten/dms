@@ -214,33 +214,45 @@
                     <t t-name="card" class="flex-row">
                         <main>
                             <div
-                                t-attf-class="oe_kanban_global_click oe_kanban_content row g-0"
+                                t-attf-class="oe_kanban_global_click oe_kanban_content row g-0 d-flex flex-column"
                             >
-                                <div class="col-3">
-                                    <a
-                                        class="h-100 d-block o_kanban_dms_file_preview"
-                                        t-att-data-id="record.id.raw_value"
-                                        t-att-id="record.id.raw_value"
-                                        t-att-name="record.name.raw_value"
-                                    >
-                                        <img
-                                            t-att-src="record.icon_url.raw_value"
-                                            style="height:70px;"
-                                            alt="Icon"
+                                <div class="row g-0">
+                                    <div class="col-3">
+                                        <a
+                                            class="h-100 d-block o_kanban_dms_file_preview"
+                                            t-att-data-id="record.id.raw_value"
+                                            t-att-id="record.id.raw_value"
+                                            t-att-name="record.name.raw_value"
+                                        >
+                                            <img
+                                                t-att-src="record.icon_url.raw_value"
+                                                style="height:70px;"
+                                                alt="Icon"
+                                            />
+                                        </a>
+                                    </div>
+                                    <div class="col-9">
+                                        <field name="name" class="fw-bold" />
+                                        <field
+                                            name="tag_ids"
+                                            widget="many2many_tags"
+                                            options="{'color_field': 'color'}"
                                         />
-                                    </a>
+                                        <field name="write_date" widget="date" />
+                                    </div>
                                 </div>
-                                <div class="col-9">
-                                    <field name="name" class="fw-bold" />
-                                    <field
-                                        name="tag_ids"
-                                        widget="many2many_tags"
-                                        options="{'color_field': 'color'}"
-                                    />
-                                    <field name="write_date" widget="date" />
-                                </div>
-                                <footer class="mt-auto pt-0 ms-1">
-                                    <div class="d-flex ms-auto oe_kanban_bottom_right">
+                                <footer class="mt-auto pt-0">
+                                    <div class="d-flex justify-content-end gap-3 oe_kanban_bottom_right">
+                                            <div t-if="record.permission_unlink.raw_value and (!record.is_locked.raw_value or (record.is_locked.raw_value and record.is_lock_editor.raw_value))" >
+                                                <button class="btn btn-danger" type="object" name="unlink">
+                                                    <i class="fa fa-trash fa-lg" title="Delete"/>
+                                                </button>
+                                            </div>
+                                            <a t-attf-href="/web/content?id=#{record.id.raw_value}&amp;field=content&amp;model=dms.file&amp;filename_field=name&amp;download=true"
+                                                class="btn btn-success text-decoration-none">
+                                                Download
+                                                <i class="fa fa-download fa-lg" title="Download"/>
+                                        </a>
                                         <span
                                             t-if="record.is_locked.raw_value"
                                             class="o_dms_file_kanban_lock"
@@ -250,12 +262,12 @@
                                                 t-att-title="record.locked_by.value"
                                             />
                                         </span>
-                                        <img
+                                        <!-- <img
                                             t-attf-src="/web/image/res.users/#{record.create_uid.raw_value}/avatar_128"
                                             t-att-alt="record.create_uid.value"
                                             class="oe_kanban_avatar"
                                             style="max-width:20px;"
-                                        />
+                                        /> -->
                                     </div>
                                 </footer>
                             </div>
@@ -505,6 +517,12 @@
                 Files are used to save content directly in Odoo.
             </p>
         </field>
+    </record>
+    <record id="action_dms_file_with_directory" model="ir.actions.server">
+        <field name="name">Files</field>
+        <field name="model_id" ref="model_dms_file"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_open_with_default_directory()</field>
     </record>
     <!-- Base action to be called when a file selector is to be used !-->
     <record id="action_dms_file_wizard_selector" model="ir.actions.act_window">
